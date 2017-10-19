@@ -10,9 +10,6 @@ import './window/resize';
 import Files from './Files';
 import { Scene, Loading } from './components';
 
-console.ignoredYellowBox = ['THREE.WebGLRenderer:'];
-
-
 export default class App extends React.Component {
   state = { assetsLoaded: false, sceneLoaded: false };
   async componentDidMount() {

@@ -115,7 +115,7 @@ window.removeEventListener = window.removeEventListener || ((eventName, listener
 window.document = new DOMDocument();
 window.document.body = new DOMElement('body');
 global.document = window.document;
-
+window.navigator.userAgent = "react-native";
 window.location = {
     href: ""
 }

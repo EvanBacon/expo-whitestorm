@@ -52,10 +52,16 @@ export default class ThreeView extends React.Component {
 
     _onGLContextCreate = async gl => {
         // Stubbed out methods for shadow rendering
-        gl.createRenderbuffer = () => { };
-        gl.bindRenderbuffer = () => { };
-        gl.renderbufferStorage = () => { };
-        gl.framebufferRenderbuffer = () => { };
+        gl.createFramebuffer = () => {
+            return null;
+        };
+        gl.createRenderbuffer = () => {
+            return null;
+        };
+        gl.bindRenderbuffer = (target, renderbuffer) => { };
+        gl.renderbufferStorage = (target, internalFormat, width, height) => { };
+        gl.framebufferTexture2D = (target, attachment, textarget, texture, level) => { };
+        gl.framebufferRenderbuffer = (target, attachmebt, renderbuffertarget, renderbuffer) => { };
 
         let arSession;
         if (this.props.enableAR) {
