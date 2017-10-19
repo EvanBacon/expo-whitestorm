@@ -9,12 +9,14 @@
     "postinstall": "python scripts/remove_babelrc.py"
   },
   "dependencies": {
-    "expo": "^21.0.0",
+    "expo": "21.0.2",
+    "expo-three": "^2.0.2",
     "lodash": "^4.17.4",
     "minivents": "^2.2.0",
-    "react": "16.0.0-alpha.12",
+    "physics-module-ammonext": "^0.1.2",
+    "react": "16.0.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
-    "three": "^0.82.1",
-    "whs": "^1.2.0"
+    "three": "^0.87.1",
+    "whs": "^2.1.8"
   }
 }

@@ -3,7 +3,9 @@ import { StyleSheet, StatusBar, View } from 'react-native';
 import cacheAssetsAsync from './util/cacheAssetsAsync';
 import arrayFromObject from './util/arrayFromObject';
 
+import './Three';
 import './window/domElement';
+import './window/resize';
 
 import Files from './Files';
 import { Scene, Loading } from './components';
@@ -44,6 +46,7 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <StatusBar hidden={false} />
         <Scene
+        style={{flex: 1}}
           onLoadingUpdated={(xhr) => {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
           }}

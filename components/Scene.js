@@ -12,145 +12,317 @@ import {
 
 import Files from '../Files';
 import MultitouchResponderMouse from '../engine/MultitouchResponderMouse';
-import WhitestormView from '../engine/WhitestormView';
-
-const THREE = require('three');
-const WHS = require('whs');
-
+// import WhitestormView from '../engine/WhitestormView';
+import ExpoTHREE from 'expo-three'
+import * as THREE from 'three';
+import * as WHS from 'whs';
+import * as PHYSICS from 'physics-module-ammonext'
+import { ThreeView } from "./index"
 //// Game
 
+
+import Touches from '../window/Touches';
+
+
+export const $world = {
+    stats: 'fps', // fps, ms, mb or false if not need.
+    autoresize: 'window',
+
+    gravity: [0, -100, 0],
+
+    camera: {
+        position: [0, 10, 50]
+    },
+
+    rendering: {
+        background: {
+            color: 0x162129
+        },
+
+        pixelRatio: window.devicePixelRatio,
+
+        renderer: {
+            antialias: false
+        }
+    },
+
+    shadowmap: {
+        type: THREE.BasicShadowMap  //THREE.PCFSoftShadowMap
+    }
+};
+
+export const appDefaults = {
+    camera: {
+        position: new THREE.Vector3(0, 10, 50),
+        far: 200
+    },
+
+    rendering: {
+        bgColor: 0x162129,
+
+        pixelRatio: window.devicePixelRatio,
+
+        renderer: {
+            antialias: false,
+
+            shadowMap: {
+                type: THREE.BasicShadowMap // : THREE.PCFSoftShadowMap
+            }
+        }
+    },
+
+    physics: {
+        ammo: process.ammoPath
+    }
+};
+
+
+
 // Render the game as a `View` component.
-export default class GameView extends React.Component {
+class Scene extends React.Component {
     state = {
         world: null,
         score: 0,
         droppedBubbles: {},
     };
-    
-    componentDidMount() { 
+
+    componentDidMount() {
+        // this.props.onFinishedLoading && this.props.onFinishedLoading();
     }
 
-      bubbleComponent = new WHS.Sphere({
-        geometry: [6, 16, 16],
-
-        mass: 10,
-
-        material: {
-          color: 0xffffff,
-          kind: 'lambert',
-        },
-
-        physics: {
-          restitution: 0.2,
-        }
-      });
-
+    AR = false;
     render() {
         let whitestormProps = {};
         if (this.state.world) {
-          Object.assign(
-            whitestormProps,
-            this.state.world.mouse.touchHandlers,
-          );
+            Object.assign(
+                whitestormProps,
+                this.state.world.mouse.touchHandlers,
+            );
         }
 
         return (
             <View {...this.props}>
-                <WhitestormView
-          {...whitestormProps}
-          onWorldCreate={this._handleWorldCreate}
-          style={styles.whitestorm}
-        />
-        <View
-          pointerEvents="none"
-          style={styles.loadingContainer}>
-          {this._renderScore()}
-          <ActivityIndicator
-            color="#ffffff"
-            size="large"
-            animating={!this.state.world}
-            style={styles.loadingIndicator}
-          />
-          <Expo.Video
-            source={Files.videos['background-music']}
-            repeat
-            volume={0.7}
-            style={{ width: 0, height: 0, position: 'absolute' }}
-          />
-        </View>
-        { this._isGameOver() && this._renderGameOver() }
+                <ThreeView
+                    style={{ flex: 1, backgroundColor: 'red' }}
+                    onContextCreate={this.onContextCreateAsync}
+                    render={this.animate}
+                    enableAR={this.AR}
+                />
+                {/* <WhitestormView
+                    {...whitestormProps}
+                    onWorldCreate={this._handleWorldCreate}
+                    style={styles.whitestorm}
+                /> */}
+                {/* <View
+                    pointerEvents="none"
+                    style={styles.loadingContainer}>
+                    {this._renderScore()}
+                    <ActivityIndicator
+                        color="#ffffff"
+                        size="large"
+                        animating={!this.state.world}
+                        style={styles.loadingIndicator}
+                    />
+                    <Expo.Video
+                        source={Files.videos['background-music']}
+                        repeat
+                        volume={0.7}
+                        style={{ width: 0, height: 0, position: 'absolute' }}
+                    />
+                </View>
+                {this._isGameOver() && this._renderGameOver()} */}
             </View>
         );
     }
 
-    _renderScore() {
-        return (
-            <Text style={{
-                fontSize: 17,
-                color: 'white',
-                fontWeight: '500',
-                backgroundColor: 'transparent',
-                position: 'absolute',
-                top: 26,
-                left: 6,
-            }}>
-                score: {this.state.score}
-            </Text>
-        );
-    }
 
-    _isGameOver() {
-        let { droppedBubbles } = this.state;
-        return droppedBubbles[1] &&
-            droppedBubbles[2] &&
-            droppedBubbles[3] &&
-            droppedBubbles[4]
-        droppedBubbles[5];
-    }
+    onContextCreateAsync = async (gl, arSession) => {
 
-    _renderGameOver() {
-        return (
-            <View
-                style={[styles.loadingContainer, {
-                    top: 50,
-                    backgroundColor: 'transparent',
-                    left: 40,
-                    right: 40,
-                }]}>
-                <Text style={{ fontSize: 32, color: 'white', textAlign: 'justify', marginBottom: 20, }}>
-                    You dropped the bubbles 😅
-        </Text>
-                <Text style={{ fontSize: 32, color: 'white', textAlign: 'justify' }}>
-                    Play again! (reset in top right)
-        </Text>
-            </View>
-        )
-    }
+        const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
 
-    addBubble(id, color) {
-        let bubble = this.bubbleComponent.clone();
-        bubble.material = new THREE.MeshLambertMaterial({ color })
-        bubble.bubbleId = id;
-        bubble.native.bubbleId = id;
-        bubble.addTo(this.world);
 
-        this.world.mouse.track(bubble);
+        appDefaults.rendering.renderer = {
+            ...appDefaults.rendering.renderer,
 
-        let bounce = (event) => {
-            if (this.state.droppedBubbles[id]) {
-                return;
+            canvas: {
+                width: gl.drawingBufferWidth,
+                height: gl.drawingBufferHeight,
+                style: {},
+                addEventListener: () => { },
+                removeEventListener: () => { },
+                clientHeight: gl.drawingBufferHeight,
+            },
+            context: gl,
+        }
+
+        const app = new WHS.App([
+            new WHS.ElementModule(),
+            new WHS.SceneModule(),
+            new WHS.DefineModule('camera', new WHS.PerspectiveCamera(appDefaults.camera)),
+            new WHS.RenderingModule(appDefaults.rendering, {
+                shadow: true
+            }),
+            new PHYSICS.WorldModule(appDefaults.physics),
+            new WHS.OrbitControlsModule(),
+            new WHS.ResizeModule(),
+            // new StatsModule()
+        ]);
+
+
+        // const app = new WHS.App([
+        //     new WHS.BasicAppPreset() // setup for :            
+        // ]);
+
+
+        const sphere = new WHS.Sphere({ // Create sphere component.
+            geometry: {
+                radius: 3,
+                widthSegments: 32,
+                heightSegments: 32
+            },
+
+            material: new THREE.MeshBasicMaterial({
+                color: 0xF2F2F2
+            }),
+
+            position: [0, 10, 0]
+        });
+
+        sphere.addTo(app); // Add sphere to world.
+
+        new WHS.Plane({
+            geometry: {
+                width: 100,
+                height: 100
+            },
+
+            material: new THREE.MeshBasicMaterial({
+                color: 0x447F8B
+            }),
+
+            rotation: {
+                x: - Math.PI / 2
             }
-            bubble.setLinearVelocity(new THREE.Vector3(0, 0, 0));
-            let force = new THREE.Vector3((Math.random() - 0.5) * 250, 500, 0);
-            bubble.applyCentralImpulse(force);
-        };
+        }).addTo(app);
 
-        bubble.on('touchstart', bounce);
-        bubble.on('touchenter', bounce);
+        app.start(); // Start animations and physics simulation.
 
-        return bubble;
+
+        // // renderer
+        // this.renderer = ExpoTHREE.createRenderer({ gl });
+        // this.renderer.setPixelRatio(scale);
+        // this.renderer.setSize(width, height);
+        // this.renderer.setClearColor(0x000000, 1.0);
+
+        // this.setupScene(arSession);
+
+        // // resize listener
+        // window.addEventListener('resize', this.onWindowResize, false);
+
+        // // setup custom world
+        // // await this.setupWorldAsync();
+
+        this.props.onFinishedLoading();
     }
 
+    setupScene = (arSession) => {
+        const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
+
+        // scene
+        this.scene = new THREE.Scene();
+
+        if (this.AR) {
+            // AR Background Texture
+            this.scene.background = ExpoTHREE.createARBackgroundTexture(arSession, this.renderer);
+
+            /// AR Camera
+            this.camera = ExpoTHREE.createARCamera(arSession, width, height, 0.01, 1000);
+        } else {
+            // Standard Background
+            this.scene.background = new THREE.Color(0x000000);
+            this.scene.fog = new THREE.Fog(0x000000, 250, 1400);
+
+            /// Standard Camera
+            this.camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000);
+            this.camera.position.set(0, 3, 7.7);
+            const cameraTarget = new THREE.Vector3(0, 1.5, 0);
+            this.camera.lookAt(cameraTarget);
+
+            // controls    
+            // this.controls = new THREE.OrbitControls(this.camera);
+        }
+    }
+
+    // _renderScore() {
+    //     return (
+    //         <Text style={{
+    //             fontSize: 17,
+    //             color: 'white',
+    //             fontWeight: '500',
+    //             backgroundColor: 'transparent',
+    //             position: 'absolute',
+    //             top: 26,
+    //             left: 6,
+    //         }}>
+    //             score: {this.state.score}
+    //         </Text>
+    //     );
+    // }
+
+    // _isGameOver() {
+    //     let { droppedBubbles } = this.state;
+    //     return droppedBubbles[1] &&
+    //         droppedBubbles[2] &&
+    //         droppedBubbles[3] &&
+    //         droppedBubbles[4]
+    //     droppedBubbles[5];
+    // }
+
+    // _renderGameOver() {
+    //     return (
+    //         <View
+    //             style={[styles.loadingContainer, {
+    //                 top: 50,
+    //                 backgroundColor: 'transparent',
+    //                 left: 40,
+    //                 right: 40,
+    //             }]}>
+    //             <Text style={{ fontSize: 32, color: 'white', textAlign: 'justify', marginBottom: 20, }}>
+    //                 You dropped the bubbles 😅
+    //     </Text>
+    //             <Text style={{ fontSize: 32, color: 'white', textAlign: 'justify' }}>
+    //                 Play again! (reset in top right)
+    //     </Text>
+    //         </View>
+    //     )
+    // }
+
+    // addBubble(id, color) {
+    //     let bubble = this.bubbleComponent.clone();
+    //     bubble.material = new THREE.MeshLambertMaterial({ color })
+    //     bubble.bubbleId = id;
+    //     bubble.native.bubbleId = id;
+    //     bubble.addTo(this.world);
+
+    //     this.world.mouse.track(bubble);
+
+    //     let bounce = (event) => {
+    //         if (this.state.droppedBubbles[id]) {
+    //             return;
+    //         }
+    //         bubble.setLinearVelocity(new THREE.Vector3(0, 0, 0));
+    //         let force = new THREE.Vector3((Math.random() - 0.5) * 250, 500, 0);
+    //         bubble.applyCentralImpulse(force);
+    //     };
+
+    //     bubble.on('touchstart', bounce);
+    //     bubble.on('touchenter', bounce);
+
+    //     return bubble;
+    // }
+    animate = (delta) => {
+
+    }
     _handleWorldCreate = (world) => {
         this.world = world;
 
@@ -605,3 +777,5 @@ function addPlanet(world) {
     world.addLoop(animation);
     animation.start();
 }
+
+export default Touches(Scene);

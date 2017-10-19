@@ -128,3 +128,8 @@ window.performance = {
 // require('./TextDecoder.js');
 
 global.HTMLCanvasElement = require('./HTMLCanvasElement');
+
+global.Worker = () => ({
+    postMessage: () => ({}),
+    transferableMessage: () => ({}),
+})
