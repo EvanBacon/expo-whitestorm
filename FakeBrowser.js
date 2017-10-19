@@ -51,4 +51,9 @@ window.innerWidth = width;
 window.innerHeight = height;
 window.document = new DOMDocument();
 
-global.performance = null;
+global.performance = {
+  mark: () => ({})
+};
+window.location = {
+  href: ""
+}

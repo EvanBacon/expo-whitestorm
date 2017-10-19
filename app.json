@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "whs",
-    "description": "A James Ide thing",
+    "name": "expo-whs",
+    "description": "A port of a James Ide thing",
     "slug": "whs",
     "privacy": "public",
     "sdkVersion": "21.0.0",
@@ -10,7 +10,8 @@
     "primaryColor": "#cccccc",
     "icon": "./assets/icons/app-icon.png",
     "loading": {
-      "icon": "./assets/icons/loading-icon.png"
+      "icon": "./assets/icons/loading-icon.png",
+      "backgroundColor": "#000000"
     },
     "packagerOpts": {
       "assetExts": ["ttf", "mp4", "jpg"],

@@ -1,5 +1,5 @@
 {
-  "name": "whs",
+  "name": "expo-whs",
   "version": "0.0.0",
   "description": "Hello Expo!",
   "author": null,
@@ -14,7 +14,7 @@
     "minivents": "^2.2.0",
     "react": "16.0.0-alpha.12",
     "react-native": "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
-    "three": "^0.87.1",
-    "whs": "^2.1.8"
+    "three": "^0.82.1",
+    "whs": "^1.2.0"
   }
 }

@@ -4,10 +4,10 @@ import Expo from 'expo';
 import React, { PropTypes } from 'react';
 import { View } from 'react-native';
 
-import ExponentRenderingPlugin from './ExponentRenderingPlugin';
+// import ExponentRenderingPlugin from './ExponentRenderingPlugin';
 
-const THREE = require('three');
-const WHS = require('whs');
+import * as THREE from 'three';
+import * as WHS from 'whs';
 
 export default class WhitestormView extends React.Component {
   static propTypes = {
@@ -46,7 +46,7 @@ export default class WhitestormView extends React.Component {
     gl.renderbufferStorage = (target, internalFormat, width, height) => {};
     gl.framebufferTexture2D = (target, attachment, textarget, texture, level) => {};
     gl.framebufferRenderbuffer = (target, attachmebt, renderbuffertarget, renderbuffer) => {};
-
+    gl.getParameter = () => ({});
     let threeRendererOptions = {
       canvas: {
         width: gl.drawingBufferWidth,
@@ -79,29 +79,29 @@ export default class WhitestormView extends React.Component {
       },
     });
 
-    world.$rendering = new ExponentRenderingPlugin({
-      gl,
+    // world.$rendering = new ExponentRenderingPlugin({
+    //   gl,
 
-      rendering: {
-        renderer: threeRendererOptions,
+    //   rendering: {
+    //     renderer: threeRendererOptions,
 
-        background: {
-          color: 0x000000,
-          opacity: 1,
-        },
+    //     background: {
+    //       color: 0x000000,
+    //       opacity: 1,
+    //     },
 
-        shadowmap: {
-          enabled: false, // Enable when EXGL supports renderbuffers and framebuffers
-          type: THREE.PCFShadowMap,
-        }
-      },
+    //     shadowmap: {
+    //       enabled: false, // Enable when EXGL supports renderbuffers and framebuffers
+    //       type: THREE.PCFShadowMap,
+    //     }
+    //   },
 
-      width: gl.drawingBufferWidth,
-      height: gl.drawingBufferHeight,
-    });
+    //   width: gl.drawingBufferWidth,
+    //   height: gl.drawingBufferHeight,
+    // });
 
-    this.world = world;
-    this.props.onWorldCreate(this.world);
+    // this.world = world;
+    // this.props.onWorldCreate(this.world);
   };
 
   componentWillUnmount() {

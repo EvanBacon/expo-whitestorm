@@ -1,5 +1,3 @@
-// const transformer = require('react-native/packager/transformer');
-
 let upstreamTransformer = null
 
 try {

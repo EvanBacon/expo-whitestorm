@@ -3,7 +3,7 @@ import { StyleSheet, StatusBar, View } from 'react-native';
 import cacheAssetsAsync from './util/cacheAssetsAsync';
 import arrayFromObject from './util/arrayFromObject';
 
-import './FakeBrowser';
+import './window/domElement';
 
 import Files from './Files';
 import { Scene, Loading } from './components';
