@@ -29,6 +29,10 @@ export default (WrappedComponent) => {
       _emit = (type, props) => {
         if (window.document && window.document.emitter) {
           window.document.emitter.emit(type, props);
+          window.document.children.map(child => {
+            child.emitter.emit(type, props)
+          });
+          global.app.emit(type, props);
         }
       }
 

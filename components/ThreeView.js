@@ -82,6 +82,7 @@ export default class ThreeView extends React.Component {
 
             this.props.render(dt);
             // NOTE: At the end of each frame, notify `Expo.GLView` with the below
+            gl.flush();            
             gl.endFrameEXP();
 
             lastFrameTime = now;

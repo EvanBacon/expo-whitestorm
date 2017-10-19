@@ -25,40 +25,26 @@ export const appDefaults = {
         position: new THREE.Vector3(0, 10, 50),
         far: 200
     },
-
     rendering: {
         bgColor: 0x162129,
-
         pixelRatio: window.devicePixelRatio,
-
         renderer: {
-            antialias: true,
-
-            shadowMap: {
-                type: THREE.PCFSoftShadowMap
-            }
         }
     },
-
     physics: {
+        // gravity: new THREE.Vector3(0, -10, 0),      
         ammo: process.ammoPath
     }
 };
-
 
 
 // Render the game as a `View` component.
 class Scene extends React.Component {
     state = {
     };
-
-    componentDidMount() {
-        // this.props.onFinishedLoading && this.props.onFinishedLoading();
-    }
-
     AR = false;
-    render() {
 
+    render() {
         return (
             <ThreeView
                 style={{ flex: 1, backgroundColor: 'red' }}
@@ -69,15 +55,17 @@ class Scene extends React.Component {
         );
     }
 
-
     onContextCreateAsync = async (gl, arSession) => {
 
         const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
 
-
         appDefaults.rendering.renderer = {
-            ...appDefaults.rendering.renderer,
-
+            antialias: true,
+            shadowMap: {
+                enabled: true,
+                type: THREE.PCFShadowMap,
+                // cascade: true
+            },
             canvas: {
                 width: gl.drawingBufferWidth,
                 height: gl.drawingBufferHeight,
@@ -85,12 +73,15 @@ class Scene extends React.Component {
                 addEventListener: () => { },
                 removeEventListener: () => { },
                 clientHeight: gl.drawingBufferHeight,
+                clientWidth: gl.drawingBufferWidth,
+                
             },
             context: gl,
         }
 
+        
         const app = new WHS.App([
-            new WHS.ElementModule(),
+            new WHS.ElementModule(document),
             new WHS.SceneModule(),
             new WHS.DefineModule('camera', new WHS.PerspectiveCamera(appDefaults.camera)),
             new WHS.RenderingModule(appDefaults.rendering, {
@@ -98,70 +89,66 @@ class Scene extends React.Component {
             }),
             new PHYSICS.WorldModule(appDefaults.physics),
             new WHS.OrbitControlsModule(),
+            new WHS.VirtualMouseModule(),
             new WHS.ResizeModule(),
             // new StatsModule()
-        ]);
 
+        ]);
+        global.app = app;
+        app.get('renderer').domElement = document;
+        new WHS.DirectionalLight({
+            color: 0xffffff,
+            position: new THREE.Vector3(1, 1, 1)
+        }).addTo(app);
+
+        new WHS.DirectionalLight({
+            color: 0x002288,
+            position: new THREE.Vector3(-1, 1, -1)
+        }).addTo(app);
 
         new WHS.AmbientLight({
-            light: {
-                color: 0xffffff,
-                intensity: 0.2
-            }
-        }).addTo(app);
-        new WHS.DirectionalLight({
-            light: {
-                color: 0xffffff,
-                intensity: 0.2
-            },
-
-            position: [10, 20, 10]
+            color: 0x222222
         }).addTo(app);
 
-        new WHS.PointLight({
-            light: {
-                color: 0xff0000,
-                intensity: 3,
-                distance: 1000
-            },
-
-            position: [10, 20, 10],
-
-            target: {
-                x: 5
-            }
-        }).addTo(app);
-
-        // const app = new WHS.App([
-        //     new WHS.BasicAppPreset() // setup for :            
-        // ]);
-
-
+        console.warn("app", Object.keys(app));
         const sphere = new WHS.Box({ // Create sphere component.
             geometry: {
                 width: 6,
                 height: 6,
                 depth: 6
             },
+            modules: [
+                new PHYSICS.SphereModule({
+                    mass: 10 // Mass of physics object.
+                })
+            ],
+            mass: 0,
 
-            material: new THREE.MeshStandardMaterial({
+            physics: {
+                restitution: 1,
+            },
+            material: new THREE.MeshPhongMaterial({
                 color: 0x4286f4,
-                metalness: 0.0,
-                roughness: 0.044676705160855
             }),
             position: [0, 10, 0]
         });
 
         sphere.addTo(app); // Add sphere to world.
         this.sphere = sphere;
+
         new WHS.Plane({
             geometry: {
                 width: 100,
                 height: 100
             },
 
-            material: new THREE.MeshBasicMaterial({
-                color: 0x447F8B
+            modules: [
+                new PHYSICS.PlaneModule({
+                    mass: 0
+                })
+            ],
+            material: new THREE.MeshPhongMaterial({
+                color: 0x447F8B,
             }),
 
             rotation: {
@@ -169,59 +156,31 @@ class Scene extends React.Component {
             }
         }).addTo(app);
 
-        // addBasicLights(app);
-
-
         app.start(); // Start animations and physics simulation.
 
+
+        new WHS.Loop(() => {
+            // sphere.rotation.x += 0.1;
+            // sphere.rotation.y += 0.1;
+        }).start(app);
+
         this.props.onFinishedLoading();
+
+        // // Add Touch Listener
+        // window.document.addEventListener('touchstart', (e) => {
+        //     console.warn("start");
+        //     // if (e.touches.length > 1) {
+        //     //     index = (index + 1) % geoms.length;
+        //     //     this.mesh.geometry = geoms[index];
+        //     // }
+
+        // });
+
     }
 
     animate = (delta) => {
-        if (this.sphere) {
-            this.sphere.rotation.x += 0.1;
-            this.sphere.rotation.y += 0.1;
-        }
+
     }
-}
-
-const styles = StyleSheet.create({
-    whitestorm: {
-        flex: 1,
-    },
-    loadingContainer: {
-        alignItems: 'center',
-        bottom: 0,
-        justifyContent: 'center',
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-    },
-    loadingIndicator: {
-
-    },
-});
-
-export function addBasicLights(app, intensity = 0.5, position = [0, 10, 10], distance = 100, shadowmap) {
-    addAmbient(app, 1 - intensity);
-
-    return new WHS.PointLight({
-        intensity,
-        distance,
-
-        shadow: Object.assign({
-            fov: 90
-        }, shadowmap),
-
-        position
-    }).addTo(app);
-}
-
-export function addAmbient(app, intensity) {
-    new WHS.AmbientLight({
-        intensity
-    }).addTo(app);
 }
 
 export default Touches(Scene);

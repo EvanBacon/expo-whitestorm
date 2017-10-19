@@ -3,6 +3,8 @@ import { Dimensions } from 'react-native';
 import EventEmitter from 'EventEmitter';
 
 class DOMNode {
+    children = [];
+    
     constructor(nodeName) {
         this.nodeName = nodeName;
     }
@@ -13,6 +15,7 @@ class DOMNode {
 
     appendChild(element) {
         // unimplemented
+        this.children.push(element);
     }
 }
 
@@ -29,6 +32,7 @@ class DOMElement extends DOMNode {
 
     addEventListener(eventName, listener) {
         this.emitter.addListener(eventName, listener)
+        console.warn("add", this.tagName, eventName);
     }
 
     removeEventListener(eventName, listener) {
@@ -73,7 +77,7 @@ class DOMElement extends DOMNode {
 class DOMDocument extends DOMElement {
     body = new DOMElement('BODY');
     documentElement = new DOMElement('HTML');
-    
+
     constructor() {
         super('#document');
     }
@@ -121,7 +125,7 @@ window.location = {
 }
 window.performance = {
     now: () => ({
-        bind: ( ()=>  ( ()=> ({}) ) )
+        bind: (() => (() => ({})))
     })
 }
 // require('./DOMParser.js');
@@ -129,7 +133,4 @@ window.performance = {
 
 global.HTMLCanvasElement = require('./HTMLCanvasElement');
 
-global.Worker = () => ({
-    postMessage: () => ({}),
-    transferableMessage: () => ({}),
-})
+global.Worker = require('pseudo-worker');
