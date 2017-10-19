@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, StatusBar, View } from 'react-native';
 import cacheAssetsAsync from './util/cacheAssetsAsync';
 import arrayFromObject from './util/arrayFromObject';
 
 import './FakeBrowser';
 
 import Files from './Files';
-import {Scene, Loading} from './components';
+import { Scene, Loading } from './components';
 
 console.ignoredYellowBox = ['THREE.WebGLRenderer:'];
 

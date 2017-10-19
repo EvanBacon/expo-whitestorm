@@ -1,6 +1,6 @@
 'use strict';
 
-import Exponent from 'exponent';
+import Expo from 'exponent';
 import React, { PropTypes } from 'react';
 import { View } from 'react-native';
 
@@ -118,7 +118,7 @@ export default class WhitestormView extends React.Component {
     // eslint-disable-next-line no-unused-vars
     const { onWorldCreate, ...viewProps } = this.props;
     return (
-      <Exponent.GLView
+      <Expo.GLView
         {...viewProps}
         onContextCreate={this._onContextCreate}
       />
