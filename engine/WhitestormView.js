@@ -1,6 +1,6 @@
 'use strict';
 
-import Expo from 'exponent';
+import Expo from 'expo';
 import React, { PropTypes } from 'react';
 import { View } from 'react-native';
 
