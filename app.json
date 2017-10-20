@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-whs",
-    "description": "A port of a James Ide thing",
+    "name": "Whitestorm",
+    "description": "A port of a Alexander Buzin / James Ide thing",
     "slug": "whs",
     "privacy": "public",
     "sdkVersion": "21.0.0",
