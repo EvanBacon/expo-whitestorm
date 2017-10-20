@@ -14,7 +14,7 @@
       "backgroundColor": "#000000"
     },
     "packagerOpts": {
-      "assetExts": ["ttf", "mp4", "jpg"],
+      "assetExts": ["ttf", "mp4", "jpg", "txt"],
       "config": "./rn-cli.config.js"      
     },
     "ios": {

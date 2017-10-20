@@ -18,6 +18,7 @@ import * as THREE from 'three';
 import * as WHS from 'whs';
 import * as PHYSICS from 'physics-module-ammonext'
 
+
 export const appDefaults = {
     camera: {
         position: new THREE.Vector3(0, 10, 50),
@@ -30,14 +31,23 @@ export const appDefaults = {
         }
     },
     physics: {
-        ammo: process.ammoPath
+        // ammo: ammonext
     }
 };
 
 class Scene extends React.Component {
     AR = false;
-    
+
     shouldComponentUpdate = () => false;
+
+    async componentDidMount() {
+        const res = require('../ammo.txt');
+        const asset = Expo.Asset.fromModule(res);
+        await asset.downloadAsync();
+        const ammoDownloadUri = asset.localUri;
+        const rawAmmo = await Expo.FileSystem.readAsStringAsync(ammoDownloadUri);
+        console.warn("loaded", ammoDownloadUri);
+    }
 
     render() {
         return (
