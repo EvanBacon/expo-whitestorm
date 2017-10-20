@@ -43,7 +43,7 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <StatusBar hidden={false} />
         <Scene
-        style={{flex: 1}}
+          style={{ flex: 1 }}
           onLoadingUpdated={(xhr) => {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
           }}

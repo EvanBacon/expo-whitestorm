@@ -11,14 +11,12 @@ import {
 } from 'react-native';
 
 import Files from '../Files';
+import { ThreeView } from "./index"
+import Touches from '../window/Touches';
 
 import * as THREE from 'three';
 import * as WHS from 'whs';
 import * as PHYSICS from 'physics-module-ammonext'
-import { ThreeView } from "./index"
-//// Game
-
-import Touches from '../window/Touches';
 
 export const appDefaults = {
     camera: {
@@ -32,22 +30,19 @@ export const appDefaults = {
         }
     },
     physics: {
-        // gravity: new THREE.Vector3(0, -10, 0),      
         ammo: process.ammoPath
     }
 };
 
-
-// Render the game as a `View` component.
 class Scene extends React.Component {
-    state = {
-    };
     AR = false;
+    
+    shouldComponentUpdate = () => false;
 
     render() {
         return (
             <ThreeView
-                style={{ flex: 1, backgroundColor: 'red' }}
+                style={{ flex: 1 }}
                 onContextCreate={this.onContextCreateAsync}
                 render={this.animate}
                 enableAR={this.AR}
@@ -74,12 +69,10 @@ class Scene extends React.Component {
                 removeEventListener: () => { },
                 clientHeight: gl.drawingBufferHeight,
                 clientWidth: gl.drawingBufferWidth,
-                
             },
             context: gl,
         }
 
-        
         const app = new WHS.App([
             new WHS.ElementModule(document),
             new WHS.SceneModule(),
@@ -91,11 +84,11 @@ class Scene extends React.Component {
             new WHS.OrbitControlsModule(),
             new WHS.VirtualMouseModule(),
             new WHS.ResizeModule(),
-            // new StatsModule()
-
         ]);
+
+        // HACK: Save this globally for touch parsing
         global.app = app;
-        app.get('renderer').domElement = document;
+
         new WHS.DirectionalLight({
             color: 0xffffff,
             position: new THREE.Vector3(1, 1, 1)
@@ -110,15 +103,14 @@ class Scene extends React.Component {
             color: 0x222222
         }).addTo(app);
 
-        console.warn("app", Object.keys(app));
-        const sphere = new WHS.Box({ // Create sphere component.
+        const box = new WHS.Box({ // Create sphere component.
             geometry: {
                 width: 6,
                 height: 6,
                 depth: 6
             },
             modules: [
-                new PHYSICS.SphereModule({
+                new PHYSICS.BoxModule({
                     mass: 10 // Mass of physics object.
                 })
             ],
@@ -133,8 +125,7 @@ class Scene extends React.Component {
             position: [0, 10, 0]
         });
 
-        sphere.addTo(app); // Add sphere to world.
-        this.sphere = sphere;
+        box.addTo(app); // Add box to world.
 
         new WHS.Plane({
             geometry: {
@@ -158,24 +149,14 @@ class Scene extends React.Component {
 
         app.start(); // Start animations and physics simulation.
 
-
+        // Build a loop to rotate the box
         new WHS.Loop(() => {
-            // sphere.rotation.x += 0.1;
-            // sphere.rotation.y += 0.1;
+            box.rotation.x += 0.1;
+            box.rotation.y += 0.1;
         }).start(app);
 
+        // Tell parent that we finished loading. This will hide the loading screen and show the scene.
         this.props.onFinishedLoading();
-
-        // // Add Touch Listener
-        // window.document.addEventListener('touchstart', (e) => {
-        //     console.warn("start");
-        //     // if (e.touches.length > 1) {
-        //     //     index = (index + 1) % geoms.length;
-        //     //     this.mesh.geometry = geoms[index];
-        //     // }
-
-        // });
-
     }
 
     animate = (delta) => {
